@@ -58,3 +58,40 @@ class Report:
         if args.save:
             self._save_report(table, args.report, headers)
         print(tabulate(table, headers=headers, tablefmt='simple', showindex=range(1, len(table) + 1)))
+
+
+class ReportPerformance(Report):
+    """
+    Класс для формирования отчетов по эффективности
+    """
+
+    @staticmethod
+    def _build_table(rows):
+        """
+        Обрабатывает данные для отчета
+        """
+        table = {}
+        for row in rows:
+            table.setdefault(row['position'], []).append(float(row['performance']))
+        # вычисляем среднее значение по позиции
+        table = {k: round(sum(v) / len(v), 2) for k, v in table.items()}
+        # сортируем и возвращаем список кортежей
+        return sorted(table.items(), key=lambda x: x[1], reverse=True)
+
+    def create(self, args):
+        """
+        Создает отчет эффективности работы разработчиков
+        """
+        try:
+            headers = ['position', 'performance']
+            rows = process_files(args.files)
+            table = self._build_table(rows)
+            # создание отчета
+            self._create_report(headers, table, args)
+        except Exception as e:
+            print(e)
+
+
+REPORT_BUILDERS = {
+    'performance': ReportPerformance
+}
