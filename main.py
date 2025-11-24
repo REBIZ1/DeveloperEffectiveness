@@ -1,4 +1,4 @@
-from main.report import Report, REPORT_BUILDERS
+from src.report import Report, REPORT_BUILDERS
 
 def main():
     args = Report._get_arguments()
